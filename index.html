@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản Lý Sản Phẩm</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px 0;
+        }
+
+        .container-main {
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+        }
+
+        .header h1 {
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .search-sort-section {
+            margin-bottom: 25px;
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            border-radius: 6px;
+            border: 2px solid #dee2e6;
+            padding: 10px 15px;
+            font-size: 16px;
+        }
+
+        .search-box input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+
+        .sort-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sort {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-sort.active {
+            background-color: #007bff;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            margin-bottom: 0;
+            border-collapse: collapse;
+        }
+
+        .table thead {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table thead th {
+            padding: 15px;
+            font-weight: 600;
+            border: none;
+            text-align: left;
+        }
+
+        .table tbody td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+            transition: background-color 0.2s ease;
+        }
+
+        .table img {
+            max-width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .price-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .category-badge {
+            background-color: #17a2b8;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .text-muted-small {
+            font-size: 13px;
+            color: #6c757d;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #007bff;
+        }
+
+        .stats {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            flex: 1;
+            min-width: 150px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-lg container-main">
+        <!-- Header -->
+        <div class="header">
+            <h1>📦 Quản Lý Sản Phẩm</h1>
+            <p class="text-muted">Tìm kiếm, sắp xếp và quản lý danh sách sản phẩm một cách dễ dàng</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats" id="stats">
+            <div class="stat-card">
+                <small>Tổng sản phẩm</small><br>
+                <span id="totalProducts">0</span>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);">
+                <small>Sản phẩm tìm thấy</small><br>
+                <span id="foundProducts">0</span>
+            </div>
+        </div>
+
+        <!-- Search and Sort Section -->
+        <div class="search-sort-section">
+            <div class="row">
+                <!-- Search Box -->
+                <div class="col-md-6 mb-3">
+                    <label for="searchInput" class="form-label fw-bold">🔍 Tìm kiếm sản phẩm:</label>
+                    <input type="text" class="form-control" id="searchInput" placeholder="Nhập tên sản phẩm...">
+                </div>
+
+                <!-- Sort Buttons -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">📊 Sắp xếp:</label>
+                    <div class="sort-buttons">
+                        <button class="btn btn-outline-primary btn-sort" data-sort="name-asc" title="Sắp xếp tên A-Z">
+                            Tên A-Z
+                        </button>
+                        <button class="btn btn-outline-primary btn-sort" data-sort="name-desc" title="Sắp xếp tên Z-A">
+                            Tên Z-A
+                        </button>
+                        <button class="btn btn-outline-success btn-sort" data-sort="price-asc" title="Sắp xếp giá từ thấp đến cao">
+                            Giá ↑
+                        </button>
+                        <button class="btn btn-outline-success btn-sort" data-sort="price-desc" title="Sắp xếp giá từ cao đến thấp">
+                            Giá ↓
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-container">
+            <table class="table table-hover" id="productTable">
+                <thead>
+                    <tr>
+                        <th width="5%">STT</th>
+                        <th width="8%">Hình</th>
+                        <th width="25%">Tên Sản Phẩm</th>
+                        <th width="20%">Mô Tả</th>
+                        <th width="12%">Danh Mục</th>
+                        <th width="10%">Giá</th>
+                        <th width="15%">Ngày Tạo</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="7" class="loading">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div id="noData" class="no-data" style="display: none;">
+                <h5>❌ Không tìm thấy sản phẩm</h5>
+                <p>Hãy thử lại với từ khóa khác</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
